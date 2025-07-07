@@ -1,9 +1,12 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 
 export const Route = createRootRoute({
-  component: () => (
+  component: IndexRoute,
+});
+
+function IndexRoute() {
+  return (
     <div className="min-h-screen bg-zinc-900 text-white font-sans tracking-widest">
-      {/* Terminal-style navigation */}
       <nav className="bg-black/50 border-b border-emerald-500/30 p-4">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -30,5 +33,5 @@ export const Route = createRootRoute({
       </nav>
       <Outlet />
     </div>
-  ),
-});
+  );
+}
