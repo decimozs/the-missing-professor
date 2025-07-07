@@ -221,7 +221,7 @@ export const useGameStore = create<GameState & GameActions>()(
 
           // Check if room is completed (all challenges done)
           const roomCompleted = newRooms[roomIndex].challenges.every(
-            (c) => c.completed
+            (c) => c.completed,
           );
           if (roomCompleted) {
             newRooms[roomIndex].completed = true;
@@ -268,6 +268,6 @@ export const useGameStore = create<GameState & GameActions>()(
     }),
     {
       name: "missing-professor-game",
-    }
-  )
+    },
+  ),
 );
