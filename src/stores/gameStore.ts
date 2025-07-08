@@ -39,6 +39,14 @@ export interface GameState {
   currentRoom: string;
   rooms: Room[];
   clues: Clue[];
+  // Room-specific progress
+  room1Progress: {
+    zipClicked: boolean;
+    attempts: number;
+    stickyNoteViewed: boolean;
+    logViewed: boolean;
+    zipUnlocked: boolean;
+  };
 }
 
 export interface GameActions {
@@ -48,6 +56,8 @@ export interface GameActions {
   submitAnswer: (challengeId: string, answer: string) => boolean;
   addClue: (clue: Clue) => void;
   resetGame: () => void;
+  // Room 1 specific actions
+  updateRoom1Progress: (progress: Partial<GameState["room1Progress"]>) => void;
 }
 
 const initialRooms: Room[] = [
@@ -55,20 +65,20 @@ const initialRooms: Room[] = [
     id: "room1",
     name: "Professor's Office",
     description:
-      "A cluttered office with papers scattered everywhere. The professor's computer is still on.",
+      "Professor Eladio Ramirez's cluttered office. His computer is still on, and there's a locked ZIP file on the desktop.",
     unlocked: true,
     completed: false,
     challenges: [
       {
-        id: "office-computer",
-        title: "Access Computer",
+        id: "room1-zip",
+        title: "The Last Login",
         description:
-          "Find the password to unlock Professor Smith's computer. Look for clues around the desk.",
-        answer: "RESEARCH123",
+          "Find the password to unlock the research_data.zip file on Professor Ramirez's desktop. Analyze the login logs and personal clues.",
+        answer: "1968ER",
         points: 100,
         completed: false,
         unlocked: true,
-        hint: "Check the sticky note under the keyboard",
+        hint: "Professor uses birth year + initials pattern. Moon landing year + E.R.",
         roomId: "room1",
       },
     ],
@@ -171,6 +181,13 @@ const initialState: GameState = {
   currentRoom: "room1",
   rooms: initialRooms,
   clues: [],
+  room1Progress: {
+    zipClicked: false,
+    attempts: 0,
+    stickyNoteViewed: false,
+    logViewed: false,
+    zipUnlocked: false,
+  },
 };
 
 export const useGameStore = create<GameState & GameActions>()(
@@ -221,7 +238,7 @@ export const useGameStore = create<GameState & GameActions>()(
 
           // Check if room is completed (all challenges done)
           const roomCompleted = newRooms[roomIndex].challenges.every(
-            (c) => c.completed,
+            (c) => c.completed
           );
           if (roomCompleted) {
             newRooms[roomIndex].completed = true;
@@ -265,9 +282,19 @@ export const useGameStore = create<GameState & GameActions>()(
             })),
           })),
         }),
+
+      updateRoom1Progress: (progress: Partial<GameState["room1Progress"]>) => {
+        const state = get();
+        set({
+          room1Progress: {
+            ...state.room1Progress,
+            ...progress,
+          },
+        });
+      },
     }),
     {
       name: "missing-professor-game",
-    },
-  ),
+    }
+  )
 );

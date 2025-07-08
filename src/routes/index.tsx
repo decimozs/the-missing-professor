@@ -1,8 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Input } from "../components/ui/input";
 import { useState, useEffect } from "react";
+import { useGameStore } from "../stores/gameStore";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -14,6 +20,10 @@ function Index() {
   const [playerName, setPlayerName] = useState("");
   const [showTerminal, setShowTerminal] = useState(false);
 
+  const navigate = useNavigate();
+  const { setPlayerName: setGamePlayerName, startGame: startGameStore } =
+    useGameStore();
+
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2000);
     return () => clearTimeout(timer);
@@ -21,7 +31,13 @@ function Index() {
 
   const startGame = () => {
     if (playerName.trim()) {
+      setGamePlayerName(playerName);
+      startGameStore();
       setShowTerminal(true);
+      // Navigate to Room 1 after a brief delay
+      setTimeout(() => {
+        navigate({ to: "/rooms/room1" });
+      }, 2000);
     }
   };
 
@@ -68,95 +84,120 @@ function Index() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
-              <div className="space-y-6">
-                <div className="border border-green-500/30 p-6 bg-green-900/10">
-                  <h3 className="text-red-400 text-xl mb-4">
-                    &gt; MISSION BRIEFING
-                  </h3>
-                  <div className="space-y-2 text-sm ">
-                    <p>
-                      &gt; Dr. Eladio Ramirez, lead AI researcher has vanished
-                    </p>
-                    <p>
-                      &gt; All that remains are encrypted notes, locked files,
-                      and strange clues scattered.
-                    </p>
-                    <p>
-                      &gt; Security systems compromised. Multiple access points
-                      breached.
-                    </p>
-                    <p className="text-yellow-400">
-                      &gt; Your mission: Navigate through secured facilities and
-                      uncover the truth.
-                    </p>
+              {!showTerminal ? (
+                <div className="space-y-6">
+                  <div className="border border-green-500/30 p-6 bg-green-900/10">
+                    <h3 className="text-red-400 text-xl mb-4">
+                      &gt; MISSION BRIEFING
+                    </h3>
+                    <div className="space-y-2 text-sm ">
+                      <p>
+                        &gt; Dr. Eladio Ramirez, lead AI researcher has
+                        vanished.
+                      </p>
+                      <p>
+                        &gt; All that remains are encrypted notes, locked files,
+                        and strange clues scattered.
+                      </p>
+                      <p>
+                        &gt; Security systems compromised. Multiple access
+                        points breached.
+                      </p>
+                      <p className="text-yellow-400">
+                        &gt; Your mission: Navigate through secured facilities
+                        and uncover the truth.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 my-8">
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto border-2 border-green-500 bg-green-900/20 flex items-center justify-center mb-2 pixel-art">
+                        <span className="text-xs">LAB A</span>
+                      </div>
+                      <div className="text-xs text-green-300">
+                        Security: HIGH
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto border-2 border-red-500 bg-red-900/20 flex items-center justify-center mb-2 pixel-art glitch-box">
+                        <span className="text-xs">SECTOR 7</span>
+                      </div>
+                      <div className="text-xs text-red-300">Status: BREACH</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto border-2 border-yellow-500 bg-yellow-900/20 flex items-center justify-center mb-2 pixel-art">
+                        <span className="text-xs">SERVER</span>
+                      </div>
+                      <div className="text-xs text-yellow-300">
+                        Access: LOCKED
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border border-green-500/30 p-6 bg-blue-900/10">
+                    <h3 className="text-blue-400 text-xl mb-4">
+                      &gt; AGENT IDENTIFICATION
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm text-green-300 mb-2">
+                          Enter Agent Codename:
+                        </label>
+                        <Input
+                          type="text"
+                          value={playerName}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setPlayerName(e.target.value)
+                          }
+                          className="bg-black border-green-500 text-green-400 font-mono focus:border-green-300"
+                          placeholder="AGENT_[CODENAME]"
+                          onKeyDown={(
+                            e: React.KeyboardEvent<HTMLInputElement>
+                          ) => e.key === "Enter" && startGame()}
+                        />
+                      </div>
+
+                      <div className="flex gap-4">
+                        <Button
+                          onClick={startGame}
+                          disabled={!playerName.trim()}
+                          className="bg-green-700 hover:bg-green-600 text-black font-bold pixel-art border-2 border-green-500"
+                        >
+                          &gt; INITIALIZE MISSION
+                        </Button>
+                        <Button
+                          onClick={() => setScanlines(!scanlines)}
+                          variant="outline"
+                          className="border-green-500 text-green-400 hover:bg-green-900/20 pixel-art"
+                        >
+                          {scanlines ? "DISABLE" : "ENABLE"} SCANLINES
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-green-400">
+                    <p>&gt; Agent {playerName} authenticated...</p>
+                    <p>&gt; Accessing facility blueprints...</p>
+                    <p>&gt; Loading first-person interface...</p>
+                    <p className="text-yellow-400 mt-4">
+                      &gt; ENTERING PROFESSOR'S OFFICE...
+                    </p>
+                  </div>
 
-                <div className="grid grid-cols-3 gap-4 my-8">
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto border-2 border-green-500 bg-green-900/20 flex items-center justify-center mb-2 pixel-art">
-                      <span className="text-xs">LAB A</span>
+                  <div className="text-center mt-6">
+                    <div className="text-green-300 text-sm pulse">
+                      INITIALIZING ROOM 1 - PROFESSOR'S OFFICE
                     </div>
-                    <div className="text-xs text-green-300">Security: HIGH</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto border-2 border-red-500 bg-red-900/20 flex items-center justify-center mb-2 pixel-art glitch-box">
-                      <span className="text-xs">SECTOR 7</span>
-                    </div>
-                    <div className="text-xs text-red-300">Status: BREACH</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto border-2 border-yellow-500 bg-yellow-900/20 flex items-center justify-center mb-2 pixel-art">
-                      <span className="text-xs">SERVER</span>
-                    </div>
-                    <div className="text-xs text-yellow-300">
-                      Access: LOCKED
+                    <div className="text-blue-400 text-xs mt-2">
+                      Loading first-person perspective...
                     </div>
                   </div>
                 </div>
-
-                <div className="border border-green-500/30 p-6 bg-blue-900/10">
-                  <h3 className="text-blue-400 text-xl mb-4">
-                    &gt; AGENT IDENTIFICATION
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm text-green-300 mb-2">
-                        Enter Agent Codename:
-                      </label>
-                      <Input
-                        type="text"
-                        value={playerName}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setPlayerName(e.target.value)
-                        }
-                        className="bg-black border-green-500 text-green-400 font-mono focus:border-green-300"
-                        placeholder="AGENT_[CODENAME]"
-                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                          e.key === "Enter" && startGame()
-                        }
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <Button
-                        onClick={startGame}
-                        disabled={!playerName.trim()}
-                        className="bg-green-700 hover:bg-green-600 text-black font-bold pixel-art border-2 border-green-500"
-                      >
-                        &gt; INITIALIZE MISSION
-                      </Button>
-                      <Button
-                        onClick={() => setScanlines(!scanlines)}
-                        variant="outline"
-                        className="border-green-500 text-green-400 hover:bg-green-900/20 pixel-art"
-                      >
-                        {scanlines ? "DISABLE" : "ENABLE"} SCANLINES
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
