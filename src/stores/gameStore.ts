@@ -47,6 +47,12 @@ export interface GameState {
     logViewed: boolean;
     zipUnlocked: boolean;
   };
+  room2Progress: {
+    started: boolean;
+    solved: boolean;
+    attempts: number;
+    correctShift: number;
+  };
 }
 
 export interface GameActions {
@@ -58,6 +64,8 @@ export interface GameActions {
   resetGame: () => void;
   // Room 1 specific actions
   updateRoom1Progress: (progress: Partial<GameState["room1Progress"]>) => void;
+  // Room 2 specific actions
+  updateRoom2Progress: (progress: Partial<GameState["room2Progress"]>) => void;
 }
 
 const initialRooms: Room[] = [
@@ -85,22 +93,22 @@ const initialRooms: Room[] = [
   },
   {
     id: "room2",
-    name: "Research Laboratory",
+    name: "AI Notes Encrypted",
     description:
-      "A high-tech laboratory with various scientific equipment and encrypted files.",
+      "A high-tech research terminal with encrypted AI notes. Decrypt the Caesar cipher from Room 1's message.",
     unlocked: false,
     completed: false,
     challenges: [
       {
-        id: "decode-files",
-        title: "Decrypt Research Files",
+        id: "room2-cipher",
+        title: "Caesar Cipher Decryption",
         description:
-          "Decode the encrypted message in the research files: EDVHPHQW",
-        answer: "BASEMENT",
+          "Decrypt the encoded message found in Professor's ZIP file using Caesar cipher techniques.",
+        answer: "HELLO, YOU HAVE DISCOVERED THE FIRST HINT. RETURN TO THE DESK FOR THE NEXT CLUE.",
         points: 150,
         completed: false,
         unlocked: true,
-        hint: "Use Caesar cipher with shift of 3",
+        hint: "Look for letter frequency patterns. The most frequent letter in the decrypted text should be 'E'.",
         roomId: "room2",
       },
     ],
@@ -187,6 +195,12 @@ const initialState: GameState = {
     stickyNoteViewed: false,
     logViewed: false,
     zipUnlocked: false,
+  },
+  room2Progress: {
+    started: false,
+    solved: false,
+    attempts: 0,
+    correctShift: 0,
   },
 };
 
@@ -288,6 +302,16 @@ export const useGameStore = create<GameState & GameActions>()(
         set({
           room1Progress: {
             ...state.room1Progress,
+            ...progress,
+          },
+        });
+      },
+
+      updateRoom2Progress: (progress: Partial<GameState["room2Progress"]>) => {
+        const state = get();
+        set({
+          room2Progress: {
+            ...state.room2Progress,
             ...progress,
           },
         });

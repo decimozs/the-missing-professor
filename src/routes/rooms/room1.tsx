@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useGameStore } from "@/stores/gameStore";
+import { RoomNavigation } from "@/components/room_navigation";
+import { CluesViewer } from "@/components/clues_viewer";
 import {
   DesktopHeader,
   DesktopIcons,
@@ -27,18 +29,20 @@ function RouteComponent() {
     resetGame,
     playerName,
     score,
+    setCurrentRoom,
   } = useGameStore();
 
   const correctPassword = "1968ER";
   const encryptedMessage =
-    "KHOOR, BRX KDYH GLVFRYHUHG WKH ILUVW KLQW. UHWXUQ WR WKH GHVN IRU WKH QH[W FORVH.";
+    "EBIIL, VLR EXSB AFPZLSBOBA QEB CFOPQ EFKQ. OBQROK QL QEB ABPH CLO QEB KBUQ ZIRB.";
 
   const { zipClicked, attempts, zipUnlocked } = room1Progress;
 
   useEffect(() => {
+    setCurrentRoom("room1");
     const timer = setTimeout(() => setShowLog(true), 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [setCurrentRoom]);
 
   const handlePasswordSubmit = () => {
     if (password.toUpperCase() === correctPassword) {
@@ -85,6 +89,12 @@ function RouteComponent() {
       <div className="scanlines"></div>
 
       <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-50"></div>
+
+      {/* Room Navigation */}
+      <RoomNavigation />
+
+      {/* Clues Viewer */}
+      <CluesViewer />
 
       <div className="relative z-10 p-4 min-h-screen">
         <DesktopHeader
