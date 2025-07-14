@@ -9,7 +9,7 @@ export function CluesViewer() {
   if (clues.length === 0) return null;
 
   return (
-    <div className="fixed top-32 right-4 z-40">
+    <div className="fixed top-1/2 right-4 transform -translate-y-1/2 z-[60]">
       <Button
         onClick={() => setIsOpen(!isOpen)}
         className="bg-purple-600 hover:bg-purple-700 text-white mb-2"
@@ -19,7 +19,7 @@ export function CluesViewer() {
       </Button>
 
       {isOpen && (
-        <div className="bg-black/90 border border-purple-400 rounded-lg p-4 max-w-sm max-h-96 overflow-y-auto">
+        <div className="bg-black/90 border border-purple-400 rounded-lg p-4 max-w-sm max-h-96 overflow-y-auto shadow-2xl">
           <div className="text-purple-400 text-sm font-bold mb-3">
             COLLECTED CLUES
           </div>

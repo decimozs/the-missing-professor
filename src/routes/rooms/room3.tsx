@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import { ChatbotFace } from "@/components/room3/chatbot_face_3d";
@@ -11,13 +11,20 @@ export const Route = createFileRoute("/rooms/room3")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const {
     addClue,
     room2Progress,
     submitAnswer,
     updateRoom3Progress,
     room3Progress,
+    setCurrentRoom,
   } = useGameStore();
+
+  // Set current room on mount
+  useEffect(() => {
+    setCurrentRoom("room3");
+  }, [setCurrentRoom]);
 
   const riddle =
     "If I am greater than you, I make no sound. But if you solve me, I'll show you around. What am I?";
@@ -30,6 +37,9 @@ function RouteComponent() {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [showDoor, setShowDoor] = useState(false);
+  const [doorInput, setDoorInput] = useState("");
+  const [doorError, setDoorError] = useState("");
 
   const addBotMessage = useCallback((text: string) => {
     setIsTyping(true);
@@ -54,17 +64,66 @@ function RouteComponent() {
       }
       if (room3Progress.flagReceived) {
         setShowFlag(true);
+        setShowDoor(true); // Show door if flag already received
       }
     };
 
     initializeFromStore();
   }, [room3Progress.riddleSolved, room3Progress.flagReceived]);
 
-  // Handle sequential message display
+  // Handle sequential message display - but only if room hasn't been completed
   useEffect(() => {
     if (!hasInitialized) {
       setHasInitialized(true);
 
+      // If room is already completed, show the completed state immediately
+      if (room3Progress.flagReceived) {
+        setMessages([
+          {
+            text: "Welcome back! I am E.R., the Emergency Response AI.",
+            isUser: false,
+            timestamp: Date.now(),
+          },
+          {
+            text: "You have already solved my riddle and received the flag: L0C4T1ON_U5B",
+            isUser: false,
+            timestamp: Date.now() + 1,
+          },
+          {
+            text: "The security door is ready for access. You may proceed to the next room.",
+            isUser: false,
+            timestamp: Date.now() + 2,
+          },
+        ]);
+        return;
+      }
+
+      // If riddle is solved but flag not yet received, show partial completion
+      if (room3Progress.riddleSolved) {
+        setMessages([
+          {
+            text: "Welcome back! I am E.R., the Emergency Response AI.",
+            isUser: false,
+            timestamp: Date.now(),
+          },
+          {
+            text: "You have solved my riddle correctly. Here is the flag you seek:",
+            isUser: false,
+            timestamp: Date.now() + 1,
+          },
+          {
+            text: "L0C4T1ON_U5B",
+            isUser: false,
+            timestamp: Date.now() + 2,
+          },
+        ]);
+        setShowFlag(true);
+        setShowDoor(true);
+        updateRoom3Progress({ flagReceived: true });
+        return;
+      }
+
+      // Normal initialization for first-time visitors
       setMessages([]);
 
       setTimeout(() => {
@@ -115,7 +174,14 @@ function RouteComponent() {
         updateRoom3Progress({ chatStarted: true });
       }
     }
-  }, [hasInitialized, riddle, room3Progress.chatStarted, updateRoom3Progress]);
+  }, [
+    hasInitialized,
+    riddle,
+    room3Progress.chatStarted,
+    room3Progress.riddleSolved,
+    room3Progress.flagReceived,
+    updateRoom3Progress,
+  ]);
 
   const addUserMessage = (text: string) => {
     setMessages((prev) => [
@@ -142,6 +208,7 @@ function RouteComponent() {
       setTimeout(() => {
         addBotMessage("L0C4T1ON_U5B.");
         setShowFlag(true);
+        setShowDoor(true); // Show the door when flag is received
         submitAnswer("ai-riddle", "SILENCE");
         updateRoom3Progress({ flagReceived: true });
         addClue({
@@ -218,6 +285,25 @@ function RouteComponent() {
     }
   };
 
+  const handleDoorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const normalizedInput = doorInput.trim().toUpperCase();
+
+    if (
+      normalizedInput === "L0C4T1ON_U5B" ||
+      normalizedInput === "L0C4TION_U5B"
+    ) {
+      setDoorError("");
+      // Navigate to Room 4
+      navigate({ to: "/rooms/room4" });
+    } else {
+      setDoorError("ACCESS DENIED: Invalid security code");
+      setDoorInput("");
+      // Flash red animation
+      setTimeout(() => setDoorError(""), 3000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-900 text-indigo-100 font-mono relative">
       {/* Background decoration */}
@@ -271,6 +357,94 @@ function RouteComponent() {
                   "To wake up E.R speak its first poem. Not a greeting but a
                   riddle."
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Techy Door Interface */}
+          {showDoor && (
+            <div className="mt-8 flex justify-center">
+              <div className="bg-gray-900 border-2 border-cyan-400 rounded-lg p-6 max-w-md w-full relative overflow-hidden">
+                {/* Animated background grid */}
+                <div className="absolute inset-0 opacity-20">
+                  <div className="grid grid-cols-8 grid-rows-8 h-full w-full">
+                    {Array.from({ length: 64 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="border border-cyan-400 animate-pulse"
+                        style={{ animationDelay: `${i * 50}ms` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Door Header */}
+                <div className="relative z-10 text-center mb-4">
+                  <div className="flex items-center justify-center mb-2">
+                    <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse mr-2" />
+                    <h3 className="text-xl font-bold text-cyan-300 font-mono">
+                      SECURITY TERMINAL
+                    </h3>
+                    <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse ml-2" />
+                  </div>
+                  <div className="text-xs text-cyan-300 font-mono tracking-wider">
+                    [ ROOM_04_ACCESS_CONTROL ]
+                  </div>
+                </div>
+
+                {/* Door Status */}
+                <div className="relative z-10 mb-4">
+                  <div className="bg-black border border-cyan-400 rounded p-3 font-mono text-sm">
+                    <div className="text-green-400 mb-1">
+                      &gt; SYSTEM STATUS: ONLINE
+                    </div>
+                    <div className="text-yellow-400 mb-1">
+                      &gt; AUTHORIZATION REQUIRED
+                    </div>
+                    <div className="text-cyan-300">
+                      &gt; ENTER SECURITY CODE:
+                    </div>
+                  </div>
+                </div>
+
+                {/* Input Form */}
+                <form onSubmit={handleDoorSubmit} className="relative z-10">
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      value={doorInput}
+                      onChange={(e) =>
+                        setDoorInput(e.target.value.toUpperCase())
+                      }
+                      placeholder="_ _ _ _ _ _ _ _ _ _ _ _"
+                      className="w-full bg-black border-2 border-cyan-400 rounded px-3 py-2 text-cyan-300 font-mono text-center text-lg tracking-widest focus:outline-none focus:border-green-400 focus:shadow-lg focus:shadow-cyan-400/25"
+                      maxLength={12}
+                    />
+                  </div>
+
+                  {doorError && (
+                    <div className="mb-4 text-center">
+                      <div className="bg-red-900 border border-red-500 rounded px-3 py-2 text-red-300 font-mono text-sm animate-pulse">
+                        {doorError}
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full bg-cyan-600 hover:bg-cyan-500 border border-cyan-400 rounded py-2 text-black font-mono font-bold text-sm tracking-wider transition-all duration-200 hover:shadow-lg hover:shadow-cyan-400/50"
+                  >
+                    [ INITIATE ACCESS ]
+                  </button>
+                </form>
+
+                {/* Door Visual */}
+                <div className="relative z-10 mt-4 text-center">
+                  <div className="text-6xl text-cyan-400 animate-pulse">🚪</div>
+                  <div className="text-xs text-cyan-300 font-mono mt-1">
+                    LABORATORY ACCESS POINT
+                  </div>
+                </div>
               </div>
             </div>
           )}
