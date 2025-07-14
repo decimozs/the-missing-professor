@@ -20,8 +20,8 @@ export function StatusBar({
 }: StatusBarProps) {
   const navigate = useNavigate();
   const { rooms } = useGameStore();
-  
-  const room2Unlocked = rooms.find(room => room.id === "room2")?.unlocked;
+
+  const room2Unlocked = rooms.find((room) => room.id === "room2")?.unlocked;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-gray-700 border-t border-gray-500 p-2">

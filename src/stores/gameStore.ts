@@ -53,6 +53,12 @@ export interface GameState {
     attempts: number;
     correctShift: number;
   };
+  room3Progress: {
+    chatStarted: boolean;
+    riddleSolved: boolean;
+    flagReceived: boolean;
+    attempts: number;
+  };
 }
 
 export interface GameActions {
@@ -66,6 +72,8 @@ export interface GameActions {
   updateRoom1Progress: (progress: Partial<GameState["room1Progress"]>) => void;
   // Room 2 specific actions
   updateRoom2Progress: (progress: Partial<GameState["room2Progress"]>) => void;
+  // Room 3 specific actions
+  updateRoom3Progress: (progress: Partial<GameState["room3Progress"]>) => void;
 }
 
 const initialRooms: Room[] = [
@@ -104,7 +112,8 @@ const initialRooms: Room[] = [
         title: "Caesar Cipher Decryption",
         description:
           "Decrypt the encoded message found in Professor's ZIP file using Caesar cipher techniques.",
-        answer: "HELLO, YOU HAVE DISCOVERED THE FIRST HINT. RETURN TO THE DESK FOR THE NEXT CLUE.",
+        answer:
+          "HELLO, YOU HAVE DISCOVERED THE FIRST HINT. RETURN TO THE DESK FOR THE NEXT CLUE.",
         points: 150,
         completed: false,
         unlocked: true,
@@ -122,15 +131,15 @@ const initialRooms: Room[] = [
     completed: false,
     challenges: [
       {
-        id: "ancient-cipher",
-        title: "Ancient Text Cipher",
+        id: "ai-riddle",
+        title: "E.R. AI Riddle Challenge",
         description:
-          "Read the first letter of each line in the ancient manuscript to reveal a hidden word.",
-        answer: "VAULT",
+          "Solve the AI's riddle to unlock the location information. Use the clue from AI_LAB_NOTES.",
+        answer: "SILENCE",
         points: 200,
         completed: false,
         unlocked: true,
-        hint: "The first letter of each line spells something: V-A-U-L-T",
+        hint: "If I am greater than you, I make no sound. But if you solve me, I'll show you around.",
         roomId: "room3",
       },
     ],
@@ -201,6 +210,12 @@ const initialState: GameState = {
     solved: false,
     attempts: 0,
     correctShift: 0,
+  },
+  room3Progress: {
+    chatStarted: false,
+    riddleSolved: false,
+    flagReceived: false,
+    attempts: 0,
   },
 };
 
@@ -312,6 +327,16 @@ export const useGameStore = create<GameState & GameActions>()(
         set({
           room2Progress: {
             ...state.room2Progress,
+            ...progress,
+          },
+        });
+      },
+
+      updateRoom3Progress: (progress: Partial<GameState["room3Progress"]>) => {
+        const state = get();
+        set({
+          room3Progress: {
+            ...state.room3Progress,
             ...progress,
           },
         });

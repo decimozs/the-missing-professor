@@ -20,16 +20,22 @@ export function CluesViewer() {
 
       {isOpen && (
         <div className="bg-black/90 border border-purple-400 rounded-lg p-4 max-w-sm max-h-96 overflow-y-auto">
-          <div className="text-purple-400 text-sm font-bold mb-3">COLLECTED CLUES</div>
-          
+          <div className="text-purple-400 text-sm font-bold mb-3">
+            COLLECTED CLUES
+          </div>
+
           <div className="space-y-3">
             {clues.map((clue) => (
               <div
                 key={clue.id}
                 className="bg-gray-900 border border-gray-600 rounded p-3 text-xs"
               >
-                <div className="text-purple-400 font-bold mb-1">{clue.title}</div>
-                <div className="text-green-400 mb-2 font-mono">{clue.content}</div>
+                <div className="text-purple-400 font-bold mb-1">
+                  {clue.title}
+                </div>
+                <div className="text-green-400 mb-2 font-mono">
+                  {clue.content}
+                </div>
                 <div className="text-gray-400 text-xs">
                   Found: {clue.foundAt} | Room: {clue.roomId.toUpperCase()}
                 </div>

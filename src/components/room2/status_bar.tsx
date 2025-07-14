@@ -39,7 +39,8 @@ export function StatusBar({
 
         <div className="flex items-center space-x-4">
           <div className="text-green-400 text-sm">
-            <span className="text-green-300">Current Shift:</span> {currentShift}
+            <span className="text-green-300">Current Shift:</span>{" "}
+            {currentShift}
           </div>
           <div className="text-green-400 text-sm">
             <span className="text-green-300">Attempts:</span> {attempts}/5

@@ -6,7 +6,7 @@ export function RoomNavigation() {
   const navigate = useNavigate();
   const { rooms, currentRoom } = useGameStore();
 
-  const unlockedRooms = rooms.filter(room => room.unlocked);
+  const unlockedRooms = rooms.filter((room) => room.unlocked);
 
   if (unlockedRooms.length <= 1) {
     return null; // Don't show navigation if only one room is unlocked
@@ -26,8 +26,8 @@ export function RoomNavigation() {
                 currentRoom === room.id
                   ? "bg-green-600 text-white cursor-not-allowed"
                   : room.completed
-                  ? "bg-gray-700 text-green-400 border-green-400 hover:bg-green-800"
-                  : "bg-gray-800 text-yellow-400 border-yellow-400 hover:bg-yellow-800"
+                    ? "bg-gray-700 text-green-400 border-green-400 hover:bg-green-800"
+                    : "bg-gray-800 text-yellow-400 border-yellow-400 hover:bg-yellow-800"
               }`}
               variant="outline"
             >

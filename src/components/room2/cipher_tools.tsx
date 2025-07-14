@@ -39,7 +39,9 @@ export function CipherTools({
     <div className="bg-gray-900 border border-green-400 rounded-lg p-4">
       <div className="flex items-center space-x-2 mb-4">
         <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-        <span className="text-green-300 text-sm font-semibold">CAESAR CIPHER TOOLS</span>
+        <span className="text-green-300 text-sm font-semibold">
+          CAESAR CIPHER TOOLS
+        </span>
       </div>
 
       <div className="space-y-4">
@@ -88,7 +90,9 @@ export function CipherTools({
         {/* Quick select buttons (only show after frequency analysis) */}
         {analysisMode && (
           <div>
-            <label className="text-green-400 text-sm block mb-2">Quick Select (Most Common Shifts):</label>
+            <label className="text-green-400 text-sm block mb-2">
+              Quick Select (Most Common Shifts):
+            </label>
             <div className="grid grid-cols-6 gap-1 text-xs">
               {[1, 3, 5, 7, 13, 23].map((shift) => (
                 <Button
@@ -120,13 +124,15 @@ export function CipherTools({
 
         {showHint && (
           <div className="bg-yellow-900 border border-yellow-400 rounded p-3 text-yellow-300 text-sm">
-            💡 Hint: Look for the letter 'E' - it's the most common letter in English. In the cipher, it might appear as 'B' (shift 23).
+            💡 Hint: Look for the letter 'E' - it's the most common letter in
+            English. In the cipher, it might appear as 'B' (shift 23).
           </div>
         )}
 
         {showFrequencyHint && (
           <div className="bg-blue-900 border border-blue-400 rounded p-3 text-blue-300 text-sm">
-            🔬 Frequency Analysis: Count how often each letter appears. The most frequent letter in the decrypted text should be 'E'.
+            🔬 Frequency Analysis: Count how often each letter appears. The most
+            frequent letter in the decrypted text should be 'E'.
           </div>
         )}
 
